@@ -1,4 +1,4 @@
-package com.lhc.hook.myapplication;
+package com.lhc.hook.myapplication.hookutil;
 
 import android.content.Context;
 import android.os.Build;

@@ -1,9 +1,12 @@
-package com.lhc.hook.myapplication;
+package com.lhc.hook.myapplication.hook;
 
 import android.content.Context;
 import android.content.Intent;
 import android.os.IBinder;
-import android.util.Log;
+
+import com.lhc.hook.myapplication.Main3Activity;
+import com.lhc.hook.myapplication.hookutil.ServiceHook;
+import com.lhc.hook.myapplication.hookutil.ServiceManager;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;

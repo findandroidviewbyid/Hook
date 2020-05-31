@@ -1,4 +1,4 @@
-package com.lhc.hook.myapplication;
+package com.lhc.hook.myapplication.hook;
 
 import android.content.Context;
 import android.content.Intent;
@@ -38,7 +38,6 @@ public class HookAMS {
                 Object defaultValue = defaultFiled.get(null);
 
                 if (defaultValue == null) {
-                    Log.i("testabc", "efaultValue==null");
                 }
                 //反射SingleTon
                 Class<?> SingletonClass = Class.forName("android.util.Singleton");
@@ -46,16 +45,13 @@ public class HookAMS {
                 mInstance.setAccessible(true);
                 iActivityManagerObject = mInstance.get(defaultValue);
                 if (iActivityManagerObject != null) {
-                    Log.e("testabc", "IActivityTaskManagerSingleton 2 ");
                     //开始动态代理，用代理对象替换掉真实的ActivityManager，瞒天过海
                     Class<?> IActivityManagerIntercept = Class.forName("android.app.IActivityTaskManager");
                     AmsInvocationHandler handler = new AmsInvocationHandler(iActivityManagerObject);
                     Object proxy = Proxy.newProxyInstance(Thread.currentThread().getContextClassLoader(), new Class<?>[]{IActivityManagerIntercept}, handler);
                     //现在替换掉这个对象
                     mInstance.set(defaultValue, proxy);
-                    Log.e("testabc", "IActivityTaskManagerSingleton 3 ");
                 } else {
-                    Log.e("testabc", "IActivityTaskManagerSingleton: is null ");
                 }
 
             } else if (Build.VERSION.SDK_INT > 25 || (Build.VERSION.SDK_INT == 25 && Build.VERSION.PREVIEW_SDK_INT > 0)) {
@@ -97,7 +93,6 @@ public class HookAMS {
                 mInstance.set(defaultValue, proxy);
             }
         } catch (Exception e) {
-            Log.e("testabc", "IActivityTaskManagerSingleton 6 ");
             e.printStackTrace();
         }
     }
@@ -113,9 +108,7 @@ public class HookAMS {
         public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
 //            Log.i("HookUtil", method.getName());
             //我要在这里搞点事情
-            Log.e(TAG, "invoke: 129 ");
             if ("startActivity".contains(method.getName())) {
-                Log.e(TAG, "invoke: 131 ");
                 Intent intent = null;
                 int index = 0;
                 for (int i = 0; i < args.length; i++) {
@@ -129,7 +122,6 @@ public class HookAMS {
 
 
             }
-            Log.e(TAG, "invoke: 300 ");
             return method.invoke(iActivityManagerObject, args);
         }
     }
