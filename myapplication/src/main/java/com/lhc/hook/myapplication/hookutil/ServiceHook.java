@@ -30,11 +30,13 @@ public class ServiceHook implements InvocationHandler {
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
         if ("queryLocalInterface".equals(method.getName())) {
-            return Proxy.newProxyInstance(proxy.getClass().getClassLoader(), new Class[] { mInterface },
-                    new HookHandler(mBase, mStub, mInvocationHandler));
-        }
+            try {
+                return Proxy.newProxyInstance(proxy.getClass().getClassLoader(), new Class[]{mInterface},
+                        new HookHandler(mBase, mStub, mInvocationHandler));
+            } catch (Exception e) {
 
-        Log.e(TAG, "ERROR!!!!! method:name = " + method.getName());
+            }
+        }
         return method.invoke(mBase, args);
     }
 
@@ -43,22 +45,19 @@ public class ServiceHook implements InvocationHandler {
         private InvocationHandler mInvocationHandler;
 
         public HookHandler(IBinder base, Class<?> stubClass,
-                           InvocationHandler InvocationHandler) {
+                           InvocationHandler InvocationHandler) throws Exception {
             mInvocationHandler = InvocationHandler;
 
-            try {
-                Method asInterface = stubClass.getDeclaredMethod("asInterface", IBinder.class);
-                this.mBase = asInterface.invoke(null, base);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            Method asInterface = stubClass.getDeclaredMethod("asInterface", IBinder.class);
+            this.mBase = asInterface.invoke(null, base);
         }
 
         @Override
         public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-            if (mInvocationHandler != null) {
+            if (mInvocationHandler != null && mBase != null) {
                 return mInvocationHandler.invoke(mBase, method, args);
             }
+            Log.e(TAG, "invoke: 66 ");
             return method.invoke(mBase, args);
         }
     }
